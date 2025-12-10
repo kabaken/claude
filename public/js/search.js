@@ -248,13 +248,22 @@ document.addEventListener('DOMContentLoaded', function() {
         }
     }
 
-    // Hide project groups that have no visible chats
+    // Hide project groups that have no visible chats and update counts
     function updateProjectVisibility() {
         const projectGroups = document.querySelectorAll('.project-group');
         projectGroups.forEach(group => {
-            const visibleCards = group.querySelectorAll('.chat-card[style*="display: block"], .chat-card:not([style*="display: none"])');
-            const hasVisible = Array.from(group.querySelectorAll('.chat-card')).some(card => card.style.display !== 'none');
-            group.style.display = hasVisible ? 'block' : 'none';
+            const allCards = group.querySelectorAll('.chat-card');
+            const visibleCards = Array.from(allCards).filter(card => card.style.display !== 'none');
+            const visibleCount = visibleCards.length;
+
+            // Update project count badge
+            const countBadge = group.querySelector('.project-count');
+            if (countBadge) {
+                countBadge.textContent = visibleCount;
+            }
+
+            // Hide group if no visible chats
+            group.style.display = visibleCount > 0 ? 'block' : 'none';
         });
     }
 });

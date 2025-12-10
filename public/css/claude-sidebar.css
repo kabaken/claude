@@ -592,16 +592,67 @@ body {
 
 /* Project Groups */
 .project-group {
-    margin-bottom: 32px;
+    margin-bottom: 16px;
 }
 
-.project-name {
+.project-header {
+    display: flex;
+    align-items: center;
+    gap: 8px;
     font-size: 16px;
     font-weight: 600;
     color: #4a90e2;
-    margin: 0 0 12px 0;
-    padding: 8px 0;
-    border-bottom: 1px solid #3c3c3c;
+    margin: 0;
+    padding: 10px 12px;
+    background-color: #333333;
+    border: 1px solid #3c3c3c;
+    border-radius: 8px;
+    cursor: pointer;
+    transition: background-color 0.2s, border-color 0.2s;
+    user-select: none;
+}
+
+.project-header:hover {
+    background-color: #3a3a3a;
+    border-color: #4a90e2;
+}
+
+.project-toggle {
+    font-size: 12px;
+    color: #999999;
+    transition: transform 0.2s;
+    width: 14px;
+}
+
+.project-group:not(.collapsed) .project-toggle {
+    transform: rotate(90deg);
+}
+
+.project-icon {
+    font-size: 14px;
+}
+
+.project-name-text {
+    flex: 1;
+}
+
+.project-count {
+    background-color: #4a90e2;
+    color: #fff;
+    font-size: 12px;
+    font-weight: 500;
+    padding: 2px 8px;
+    border-radius: 10px;
+    min-width: 24px;
+    text-align: center;
+}
+
+.project-chats {
+    padding: 12px 0 0 0;
+}
+
+.project-group.collapsed .project-chats {
+    display: none;
 }
 
 /* Analysis Results Box */

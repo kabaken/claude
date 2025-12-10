@@ -77,8 +77,14 @@
             
             <div class="chat-list">
             <% sortedProjects.forEach(projectName => { %>
-                <div class="project-group">
-                    <h3 class="project-name">📁 <%= projectName %></h3>
+                <div class="project-group collapsed">
+                    <h3 class="project-header" onclick="toggleProject(this)">
+                        <span class="project-toggle">▶</span>
+                        <span class="project-icon">📁</span>
+                        <span class="project-name-text"><%= projectName %></span>
+                        <span class="project-count" data-total="<%= chatsByProject[projectName].length %>"><%= chatsByProject[projectName].length %></span>
+                    </h3>
+                    <div class="project-chats">
                     <% chatsByProject[projectName].forEach(chat => { %>
                         <div class="chat-card"
                              data-title="<%= chat.firstMessage || '' %>"
@@ -124,6 +130,7 @@
                             </div>
                         </div>
                     <% }) %>
+                    </div>
                 </div>
             <% }) %>
             </div>
@@ -131,6 +138,12 @@
     </div>
     <script src="/js/search.js"></script>
     <script>
+        // Toggle project collapse
+        function toggleProject(header) {
+            const projectGroup = header.closest('.project-group');
+            projectGroup.classList.toggle('collapsed');
+        }
+
         // Close results function
         function closeResults() {
             const resultsDiv = document.getElementById('analysis-results');

@@ -438,12 +438,16 @@ app.get('/', async (req, res) => {
       }
     }
     
-    // Sort projects by name
-    const sortedProjects = Object.keys(chatsByProject).sort();
-    
     // Sort chats within each project by modified time (newest first)
-    sortedProjects.forEach(projectName => {
+    Object.keys(chatsByProject).forEach(projectName => {
       chatsByProject[projectName].sort((a, b) => b.modifiedTime - a.modifiedTime);
+    });
+
+    // Sort projects by their most recent chat (newest first)
+    const sortedProjects = Object.keys(chatsByProject).sort((a, b) => {
+      const aLatest = chatsByProject[a][0]?.modifiedTime || 0;
+      const bLatest = chatsByProject[b][0]?.modifiedTime || 0;
+      return bLatest - aLatest;
     });
     
     // Calculate stats
