@@ -12,6 +12,25 @@ document.addEventListener('DOMContentLoaded', function() {
     let originalOrder = [];
     let currentSearchTerm = '';
     let currentMinMessages = 0;
+
+    // Cookie helper functions
+    function setCookie(name, value, days = 365) {
+        const expires = new Date(Date.now() + days * 864e5).toUTCString();
+        document.cookie = `${name}=${value}; expires=${expires}; path=/`;
+    }
+
+    function getCookie(name) {
+        const match = document.cookie.match(new RegExp('(^| )' + name + '=([^;]+)'));
+        return match ? match[2] : null;
+    }
+
+    // Restore filter from cookie
+    const savedFilter = getCookie('messageFilter');
+    if (savedFilter && messageFilter) {
+        messageFilter.value = savedFilter;
+        currentMinMessages = parseInt(savedFilter, 10);
+        applyFilters();
+    }
     
     // Store original order
     chatCards.forEach((card, index) => {
@@ -48,6 +67,7 @@ document.addEventListener('DOMContentLoaded', function() {
     if (messageFilter) {
         messageFilter.addEventListener('change', function() {
             currentMinMessages = parseInt(this.value, 10);
+            setCookie('messageFilter', this.value);
             applyFilters();
         });
     }
