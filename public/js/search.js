@@ -6,10 +6,12 @@ document.addEventListener('DOMContentLoaded', function() {
     const findResultsCount = document.querySelector('.find-results-count');
     const chatList = document.querySelector('.chat-list');
     const chatCards = document.querySelectorAll('.chat-card');
-    
+    const messageFilter = document.getElementById('message-filter');
+
     let isInFindMode = false;
     let originalOrder = [];
     let currentSearchTerm = '';
+    let currentMinMessages = 0;
     
     // Store original order
     chatCards.forEach((card, index) => {
@@ -41,6 +43,14 @@ document.addEventListener('DOMContentLoaded', function() {
             }
         });
     }
+
+    // Message count filter
+    if (messageFilter) {
+        messageFilter.addEventListener('change', function() {
+            currentMinMessages = parseInt(this.value, 10);
+            applyFilters();
+        });
+    }
     
     function toggleFindMode() {
         if (isInFindMode) {
@@ -66,10 +76,15 @@ document.addEventListener('DOMContentLoaded', function() {
         findInput.value = '';
         findResultsCount.textContent = '';
         currentSearchTerm = '';
-        
-        // Show all chat cards and hide match count lines
+
+        // Show chat cards based on message filter
         chatCards.forEach(card => {
-            card.style.display = 'block';
+            const messageCount = parseInt(card.dataset.messageCount, 10) || 0;
+            if (messageCount > currentMinMessages) {
+                card.style.display = 'block';
+            } else {
+                card.style.display = 'none';
+            }
             card.querySelector('.match-count-line').style.display = 'none';
             // Reset download links to original URLs
             const downloadLink = card.querySelector('.download-link');
@@ -78,9 +93,10 @@ document.addEventListener('DOMContentLoaded', function() {
                 downloadLink.href = `/download/${chatId}`;
             }
         });
-        
+
         // Restore original order
         restoreOriginalOrder();
+        updateProjectVisibility();
     }
     
     // Add click handler for chat links to pass search term
@@ -98,9 +114,14 @@ document.addEventListener('DOMContentLoaded', function() {
         currentSearchTerm = searchTerm;
         
         if (!searchTerm) {
-            // No search term - show all in original order
+            // No search term - apply message filter only
             chatCards.forEach(card => {
-                card.style.display = 'block';
+                const messageCount = parseInt(card.dataset.messageCount, 10) || 0;
+                if (messageCount > currentMinMessages) {
+                    card.style.display = 'block';
+                } else {
+                    card.style.display = 'none';
+                }
                 card.querySelector('.match-count-line').style.display = 'none';
                 // Reset download links to original URLs
                 const downloadLink = card.querySelector('.download-link');
@@ -111,6 +132,7 @@ document.addEventListener('DOMContentLoaded', function() {
             });
             findResultsCount.textContent = '';
             restoreOriginalOrder();
+            updateProjectVisibility();
             return;
         }
         
@@ -122,10 +144,18 @@ document.addEventListener('DOMContentLoaded', function() {
         chatCards.forEach(card => {
             // Use the full searchable text that includes all messages
             const searchableText = (card.dataset.searchable || '').toLowerCase();
-            
+            const messageCount = parseInt(card.dataset.messageCount, 10) || 0;
+
+            // Check message filter first
+            if (messageCount <= currentMinMessages) {
+                card.style.display = 'none';
+                card.querySelector('.match-count-line').style.display = 'none';
+                return;
+            }
+
             // Count matches
             const matches = countMatches(searchableText, searchLower);
-            
+
             if (matches > 0) {
                 results.push({
                     card: card,
@@ -163,6 +193,7 @@ document.addEventListener('DOMContentLoaded', function() {
         
         // Sort by match count (most matches first)
         sortByMatches(results);
+        updateProjectVisibility();
     }
     
     function countMatches(text, searchTerm) {
@@ -189,10 +220,41 @@ document.addEventListener('DOMContentLoaded', function() {
     function restoreOriginalOrder() {
         // Sort by original index
         originalOrder.sort((a, b) => a.originalIndex - b.originalIndex);
-        
+
         // Re-append in original order
         originalOrder.forEach(item => {
             chatList.appendChild(item.card);
+        });
+    }
+
+    // Apply both search and message filter
+    function applyFilters() {
+        if (isInFindMode && currentSearchTerm) {
+            performFind(currentSearchTerm);
+        } else {
+            // Only message filter active
+            let visibleCount = 0;
+            chatCards.forEach(card => {
+                const messageCount = parseInt(card.dataset.messageCount, 10) || 0;
+                if (messageCount > currentMinMessages) {
+                    card.style.display = 'block';
+                    visibleCount++;
+                } else {
+                    card.style.display = 'none';
+                }
+                card.querySelector('.match-count-line').style.display = 'none';
+            });
+            updateProjectVisibility();
+        }
+    }
+
+    // Hide project groups that have no visible chats
+    function updateProjectVisibility() {
+        const projectGroups = document.querySelectorAll('.project-group');
+        projectGroups.forEach(group => {
+            const visibleCards = group.querySelectorAll('.chat-card[style*="display: block"], .chat-card:not([style*="display: none"])');
+            const hasVisible = Array.from(group.querySelectorAll('.chat-card')).some(card => card.style.display !== 'none');
+            group.style.display = hasVisible ? 'block' : 'none';
         });
     }
 });

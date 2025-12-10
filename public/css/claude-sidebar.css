@@ -111,6 +111,39 @@ body {
     gap: 8px;
 }
 
+.filter-controls {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    margin-left: auto;
+}
+
+.message-filter {
+    background-color: #333333;
+    border: 1px solid #3c3c3c;
+    border-radius: 6px;
+    padding: 6px 10px;
+    font-size: 13px;
+    color: #e3e3e3;
+    cursor: pointer;
+    outline: none;
+    transition: border-color 0.2s;
+}
+
+.message-filter:hover {
+    border-color: #4a90e2;
+}
+
+.message-filter:focus {
+    border-color: #4a90e2;
+    box-shadow: 0 0 0 2px rgba(74, 144, 226, 0.2);
+}
+
+.message-filter option {
+    background-color: #333333;
+    color: #e3e3e3;
+}
+
 .section-title {
     font-size: 18px;
     font-weight: 500;
