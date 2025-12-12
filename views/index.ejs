@@ -142,7 +142,31 @@
         function toggleProject(header) {
             const projectGroup = header.closest('.project-group');
             projectGroup.classList.toggle('collapsed');
+
+            // Save collapsed state
+            saveCollapsedState();
         }
+
+        // Save which projects are collapsed
+        function saveCollapsedState() {
+            const collapsedProjects = [];
+            document.querySelectorAll('.project-group.collapsed').forEach(group => {
+                const projectName = group.querySelector('.project-name-text')?.textContent;
+                if (projectName) {
+                    collapsedProjects.push(projectName);
+                }
+            });
+            sessionStorage.setItem('collapsedProjects', JSON.stringify(collapsedProjects));
+        }
+
+        // Save scroll position when clicking chat links
+        document.addEventListener('click', function(e) {
+            const chatLink = e.target.closest('.chat-link');
+            if (chatLink) {
+                sessionStorage.setItem('homeScrollPosition', window.scrollY.toString());
+                saveCollapsedState();
+            }
+        });
 
         // Close results function
         function closeResults() {

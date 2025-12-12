@@ -31,7 +31,32 @@ document.addEventListener('DOMContentLoaded', function() {
         currentMinMessages = parseInt(savedFilter, 10);
         applyFilters();
     }
-    
+
+    // Restore scroll position and collapsed state
+    const savedScrollPosition = sessionStorage.getItem('homeScrollPosition');
+    const savedCollapsedState = sessionStorage.getItem('collapsedProjects');
+
+    if (savedCollapsedState) {
+        try {
+            const collapsedProjects = JSON.parse(savedCollapsedState);
+            document.querySelectorAll('.project-group').forEach(group => {
+                const projectName = group.querySelector('.project-name-text')?.textContent;
+                if (projectName && !collapsedProjects.includes(projectName)) {
+                    group.classList.remove('collapsed');
+                }
+            });
+        } catch (e) {
+            console.error('Failed to restore collapsed state:', e);
+        }
+    }
+
+    if (savedScrollPosition) {
+        setTimeout(() => {
+            window.scrollTo(0, parseInt(savedScrollPosition, 10));
+            sessionStorage.removeItem('homeScrollPosition');
+        }, 100);
+    }
+
     // Store original order
     chatCards.forEach((card, index) => {
         originalOrder.push({
